@@ -16,7 +16,7 @@ def change_font(new_font_family):
     textarea.config(font=current_font)
 
 # Function to toggle bold text    
-def toggle_doc():
+def toggle_bold():
     current_font = font.Font(font=textarea.cget("font"))
     current_weight = current_font.actual("weight")
     new_weight = "bold" if current_weight == "normal" else "normal"
@@ -30,33 +30,27 @@ root.geometry("600x400")
 
 # Top frame for buttons
 top_frame = Frame(root)
-top_frame.pack(side=TOP, fill=x)
+top_frame.pack(side=TOP, fill=X)
 
 # Save Button
 save_btn = Button(top_frame, text="Save", command=save_doc)
 save_btn.pack(side=LEFT, padx=5, pady=5)
 
-# Font Menu
-font_btn = Menubutton(root, text="Font")
-font_btn.grid(row=1, column=1)
+# Font dropdown menu
+font_var = StringVar(value="Arial")  # Default font
+font_menu = OptionMenu(top_frame, font_var, "Arial", "Algerian", "Cambria", "Courier", command=change_font)
+font_menu.pack(side=LEFT, padx=5, pady=5)
 
-font_menu = Menu(font_btn, tearoff=0)
-font_btn["menu"] = font_menu
+# Bold button
+bold_btn = Button(top_frame, text="Bold", command=toggle_bold)
+bold_btn.pack(side=LEFT, padx=5, pady=5)
 
-font_names = ["Arial", "Algerian", "Cambria", "Courier"]
-for font_name in font_names:
-    font_menu.add_radiobutton(label=font_name, command=lambda f=font_name: change_font(f))
+# Text area
+textarea = Text(root, wrap=WORD, undo=True, font=("Arial", 12))
+textarea.pack(expand=True, fill=BOTH, padx=5, pady=5)
 
-# Bold Button
-bold_btn = Button(root, text="Bold", command=bold_doc)
-bold_btn.grid(row=1, column=2)
+# Set the initial font configuration
+textarea.config(font=font.Font(family="Arial", size=12))
 
-# Text Area
-textarea = Text(root)
-textarea.grid(row=2, columnspan=3)
-
-# Initial font configuration
-default_font = font.Font(family="Arial", size=12)
-textarea.config(font=default_font)
-
+# Run the application
 root.mainloop()
