@@ -66,12 +66,12 @@ exit_drawing_btn = Button(root, text="Exit Drawing", command=disable_drawing)
 exit_drawing_btn.grid(row=1, column=4)
 
 # Text Area
-textarea = Text(root)
+textarea = Text(root, bg="White", width=200, height=47)
 textarea.grid(row=2, columnspan=3)
 
 # Canvas for drawing
-canvas = Canvas(root, bg="white", width=400, height=300)
-canvas.grid(row=2, columnspan=3)
+canvas = Canvas(root, bg="White", width=1400, height=760)
+canvas.grid(row=2, columnspan=5)
 canvas.grid_remove()  # Hide canvas initially
 
 
@@ -79,7 +79,7 @@ canvas.bind("<Button-1>", start_draw)
 canvas.bind("<B1-Motion>", draw)
 
 # Initial font configuration
-default_font = font.Font(family="Arial", size=12)
+default_font = font.Font(family="Arial", size=10)
 textarea.config(font=default_font)
 
 root.mainloop()
