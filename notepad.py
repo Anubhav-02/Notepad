@@ -1,56 +1,85 @@
 from tkinter import *
 from tkinter import font, filedialog
 
-# Function to save the document
 def save_doc():
     text = textarea.get("1.0","end-1c")
-    location = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
+    location = filedialog.asksaveasfilename()
     if location:
         with open(location, "w") as file:
             file.write(text)
 
-# Function to change the font of the text area
-def change_font(new_font_family):
-    current_font = font.Font(font=textarea.cget("font"))
-    current_font.config(family=new_font_family)
-    textarea.config(font=current_font)
+def change_font(new_font):
+    textarea.config(font=new_font)
 
-# Function to toggle bold text    
-def toggle_bold():
-    current_font = font.Font(font=textarea.cget("font"))
-    current_weight = current_font.actual("weight")
-    new_weight = "bold" if current_weight == "normal" else "normal"
-    current_font.config(weight=new_weight)
-    textarea.config(font=current_font)
+def bold_doc():
+    current_font = textarea.cget("font")
+    bold_font = font.Font(font=current_font)
+    bold_font.configure(weight="bold")
+    textarea.config(font=bold_font)
 
-# Initialize the root window
+def enable_drawing():
+    textarea.grid_remove()
+    canvas.grid(row=2, columnspan=3)
+
+def disable_drawing():
+    canvas.grid_remove()
+    textarea.grid(row=2,columnspan=3)
+
+# Drawing functions
+def start_draw(event):
+    global last_x, last_y
+    last_x, last_y = event.x, event.y
+
+def draw(event):
+    global last_x, last_y
+    canvas.create_line((last_x, last_y, event.x, event.y), fill="black", width=2)
+    last_x, last_y = event.x, event.y
+
 root = Tk()
-root.title("Notepad")
-root.geometry("600x400")
-
-# Top frame for buttons
-top_frame = Frame(root)
-top_frame.pack(side=TOP, fill=X)
+root.title("Zeus.Notepad")
 
 # Save Button
-save_btn = Button(top_frame, text="Save", command=save_doc)
-save_btn.pack(side=LEFT, padx=5, pady=5)
+save_btn = Button(root, text="Save", command=save_doc)
+save_btn.grid(row=1, column=0)
 
-# Font dropdown menu
-font_var = StringVar(value="Arial")  # Default font
-font_menu = OptionMenu(top_frame, font_var, "Arial", "Algerian", "Cambria", "Courier", command=change_font)
-font_menu.pack(side=LEFT, padx=5, pady=5)
+# Font Menu
+font_btn = Menubutton(root, text="Font")
+font_btn.grid(row=1, column=1)
 
-# Bold button
-bold_btn = Button(top_frame, text="Bold", command=toggle_bold)
-bold_btn.pack(side=LEFT, padx=5, pady=5)
+font_menu = Menu(font_btn, tearoff=0)
+font_btn["menu"] = font_menu
 
-# Text area
-textarea = Text(root, wrap=WORD, undo=True, font=("Arial", 12))
-textarea.pack(expand=True, fill=BOTH, padx=5, pady=5)
+font_names = ["Arial", "Algerian", "Cambria", "Courier"]
+for font_name in font_names:
+    font_menu.add_radiobutton(label=font_name, command=lambda f=font_name: change_font(f))
 
-# Set the initial font configuration
-textarea.config(font=font.Font(family="Arial", size=12))
+# Bold Button
+bold_btn = Button(root, text="Bold", command=bold_doc)
+bold_btn.grid(row=1, column=2)
 
-# Run the application
+# Pencil Button (to switch to drawing mode)
+pencil_btn = Button(root, text="Pencil", command=enable_drawing)
+pencil_btn.grid(row=1, column=3)
+
+# Exit Drawing Mode Button
+exit_drawing_btn = Button(root, text="Exit Drawing", command=disable_drawing)
+exit_drawing_btn.grid(row=1, column=4)
+
+# Text Area
+textarea = Text(root)
+textarea.grid(row=2, columnspan=3)
+
+# Canvas for drawing
+canvas = Canvas(root, bg="white", width=400, height=300)
+canvas.grid(row=2, columnspan=3)
+canvas.grid_remove()  # Hide canvas initially
+
+
+canvas.bind("<Button-1>", start_draw)
+canvas.bind("<B1-Motion>", draw)
+
+# Initial font configuration
+default_font = font.Font(family="Arial", size=12)
+textarea.config(font=default_font)
+
 root.mainloop()
